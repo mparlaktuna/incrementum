@@ -1,7 +1,7 @@
 (add-to-load-path (dirname (current-filename)))
 
 (use-modules (test-driver))
-(use-modules (compiler))
+(use-modules (compiler x86))
 
 (clear-tests)
 

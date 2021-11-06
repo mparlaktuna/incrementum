@@ -23,5 +23,5 @@
      (set! *all-tests*
         (cons
            '(test-name [expr string  output-string] ...)
-            all-tests))]))
+            *all-tests*))]))
 
