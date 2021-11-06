@@ -2,8 +2,28 @@
   #:export (compile))
   
 (define wordsize 8)
+
+(define nil-tag #x3F)
+
+(define boolean-mask #xBF)
+(define boolean-bit  #x06)
 (define true-tag     #x6F)
 (define false-tag    #x2F)
+
+(define fixnum-shift 2)
+(define fixnum-mask  #x03)
+(define fixnum-tag   #x00)
+
+(define char-shift 8)
+(define char-mask  #x3F)
+(define char-tag   #x0F)
+
+(define object-mask #x07)
+(define cons-tag    #x01)
+(define vector-tag  #x05)
+(define string-tag  #x06)
+
+(define heap-align-mask #xF8)
 
 (define ax  'rax)
 (define bx  'rbx)
@@ -35,17 +55,23 @@
 
 (define (immediate? expr)
   (or (null? expr)
-      ;; (fixnum? expr)
-      (number? expr)
+      (fixnum? expr)
       (boolean? expr)
       (char? expr)))
+      
+(define fixnum?
+  (let* ((bit-length (- (* wordsize 8) fixnum-shift))
+         (lower-bound (- (expt 2 (- bit-length 1))))
+         (upper-bound (- (expt 2 (- bit-length 1)) 1)))
+    (lambda (x)
+      (and (integer? x) (exact? x) (<= lower-bound x upper-bound)))))
   
 (define (immediate-rep x)
   (cond
-   ;; ((fixnum? x) (ash x fixnum-shift))
+   ((fixnum? x) (ash x fixnum-shift))
    ((boolean? x) (if x true-tag false-tag))
-   ;; ((null? x) nil-tag)
-   ;; ((char? x) (logor (ash (char->integer x) char-shift) char-tag))
+   ((null? x) nil-tag)
+   ((char? x) (logior (ash (char->integer x) char-shift) char-tag))
    (else #f)))
 
 (define (emit-immediate value . args)

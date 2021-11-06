@@ -19,4 +19,4 @@
 
 (display-tests)
 
-(compile #t "build/stst.s")
+(compile #\c "build/stst.s")
